@@ -1,0 +1,40 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    padding: 2em;
+}
+
+.message-title {
+    font-size: 1.2em;
+    font-weight: 400;
+    margin-bottom: 20px;
+    padding-left: 1em;
+}
+
+.message-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    min-height: 70px;
+}
+
+.message-card:hover {
+    background-color: #313131;
+}
+
+.message-card.selected {
+    background-color: #444444;
+}
+
+.message-sender {
+    font-weight: 500;
+} 
+
+.message-text {
+    font-weight: 200;
+    font-size: 0.9em;
+    color: #c7c7c7;
+}

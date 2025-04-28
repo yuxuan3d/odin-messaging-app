@@ -1,0 +1,20 @@
+.bio {
+    display: flex;
+    flex-direction: column;
+    padding: 2em;
+}
+
+.bio-title {
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+.bio-name {
+    display: flex;
+    justify-content: center;
+}
+
+.bio-description {
+    font-size: 1em;
+    font-weight: 200;
+}
