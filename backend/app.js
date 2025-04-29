@@ -321,6 +321,57 @@ app.post('/messages', isAuthenticated, async (req, res) => {
     }
 })
 
+app.put('/bio', isAuthenticated, async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Authentication required.' });
+    }
+    const userId = req.user.id;
+    const { bio } = req.body;
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { bio },
+        });
+        res.json(updatedUser);
+    } catch (err) {
+        console.error("Error updating user bio:", err);
+        res.status(500).json({ message: 'Error updating user bio' });
+    }
+})
+
+app.get('/users/search', isAuthenticated, async (req, res) => {
+    const loggedinUserId = req.user.id;
+    const usernameToSearch = req.query.username;
+
+    if (!usernameToSearch || typeof usernameToSearch !== 'string' || usernameToSearch.trim() === '') {
+        return res.status(400).json({ message: 'Invalid username parameter.' });
+    }
+
+    try {
+        const foundUser = await prisma.user.findUnique({
+            where: { username: usernameToSearch },
+            select: {
+                id: true,
+                username: true,
+                bio: true,
+            },
+        });
+
+       if (!foundUser) {
+           return res.status(404).json({ message: 'User not found.' });
+       }
+
+       if (foundUser.id === loggedinUserId) {
+            return res.status(404).json({ message: 'Cannot add yourself' });
+        }
+
+        res.json(foundUser);
+    } catch (err) {
+        console.error("Error searching for user:", err);
+        res.status(500).json({ message: 'Error searching for user' });
+    }
+})
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

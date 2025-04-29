@@ -18,3 +18,10 @@
     font-size: 1em;
     font-weight: 200;
 }
+
+.bio-button-wrapper {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+}

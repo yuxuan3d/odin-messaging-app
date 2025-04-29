@@ -100,7 +100,7 @@ function Chat({ selectedPartner }) {
       };
       setMessages(prev => [...prev, optimisticMessage]);
       setNewMessage('')
-      fetchMessages(selectedPartner.id); // Refresh messages to show the new one
+      
  
       try {
           const response = await api.post('/messages', messageToSend);
@@ -113,6 +113,7 @@ function Chat({ selectedPartner }) {
  
           // Scroll to bottom after sending
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          fetchMessages(selectedPartner.id); // Refresh messages to show the new one
  
       } catch (err) {
           console.error("Failed to send message:", err);
@@ -132,50 +133,54 @@ function Chat({ selectedPartner }) {
 
   return (
     <div className="chat">
-      <h2 className="chat-header">Chat with {selectedPartner.username}</h2>
-      {error && <p className="error-message" style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-      <div className="chat-messages-container" ref={chatContainerRef}>
-        {/* Load More Button (shown if there's a cursor) */}
-        {nextCursor && (
-          <div style={{ textAlign: 'center', margin: '10px 0' }}>
-            <button onClick={handleLoadMore} disabled={loadingMore}>
-              {loadingMore ? 'Loading...' : 'Load Older Messages'}
-            </button>
-          </div>
-        )}
+      <div className='chat-container'>
+        <h2 className="chat-header">Chat with {selectedPartner.username}</h2>
+        {error && <p className="error-message" style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+        <div className='chat-messages-scroller'>
+          <div className="chat-messages-container" ref={chatContainerRef}>
+            {/* Load More Button (shown if there's a cursor) */}
+            {nextCursor && (
+              <div style={{ textAlign: 'center', margin: '10px 0' }}>
+                <button onClick={handleLoadMore} disabled={loadingMore}>
+                  {loadingMore ? 'Loading...' : 'Load Older Messages'}
+                </button>
+              </div>
+            )}
 
-        {/* Display Messages */}
-        {messages.length === 0 && !loading && <p className="no-messages">No messages yet. Start the conversation!</p>}
-        {messages.map((message) => (
-          <div
-            key={message.id} // Use real ID (or temp ID for optimistic)
-            // Add classes to style messages from self vs other
-            className={`message-bubble ${message.sender.id === currentUser.id ? 'sent' : 'received'}`}
-            style={message.isOptimistic ? { opacity: 0.7 } : {}} // Style optimistic messages
-          >
-            <div className='message-content'>{message.content}</div>
-            {/* Optional: Display timestamp */}
-            {/* <div className='message-timestamp'>{new Date(message.createdAt).toLocaleTimeString()}</div> */}
+            {/* Display Messages */}
+            {messages.length === 0 && !loading && <p className="no-messages">No messages yet. Start the conversation!</p>}
+            {messages.map((message) => (
+              <div
+                key={message.id} // Use real ID (or temp ID for optimistic)
+                // Add classes to style messages from self vs other
+                className={`message-bubble ${message.sender.id === currentUser.id ? 'sent' : 'received'}`}
+                style={message.isOptimistic ? { opacity: 0.7 } : {}} // Style optimistic messages
+              >
+                <div className='message-content'>{message.content}</div>
+                {/* Optional: Display timestamp */}
+                {/* <div className='message-timestamp'>{new Date(message.createdAt).toLocaleTimeString()}</div> */}
+              </div>
+            ))}
+            {/* Empty div at the end to scroll to */}
+            <div ref={messagesEndRef} />
           </div>
-        ))}
-        {/* Empty div at the end to scroll to */}
-        <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <form className='chat-input-form' onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            className='chat-input'
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+            disabled={!selectedPartner} // Disable if no chat selected
+          />
+          <button type="submit" className='chat-send-button' disabled={!newMessage.trim()}>
+            Send
+          </button>
+        </form>
       </div>
-
-      {/* Input Area */}
-      <form className='chat-input-form' onSubmit={handleSendMessage}>
-        <input
-          type="text"
-          className='chat-input'
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-          disabled={!selectedPartner} // Disable if no chat selected
-        />
-        <button type="submit" className='chat-send-button' disabled={!newMessage.trim()}>
-          Send
-        </button>
-      </form>
     </div>
   );
 }

@@ -1,16 +1,24 @@
 .chat {
     display: flex;
     flex-direction: column;
-    padding: 2em;
     border-left:solid 1px #505050;
     border-right:solid 1px #505050;
+    height: 100%;
+}
+
+.chat-container {
+    padding: 2em;
+    height: 100%;
+}
+
+.chat-messages-scroller {
+    overflow-y: scroll;
+    height: calc(100vh - 6em - 30px - 30px);
 }
 
 .chat-messages-container {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-
     gap: 1em;
 }
 
@@ -47,7 +55,7 @@
 .chat-input-form {
     display: flex;
     width: 100%;
-    margin-top: 20px;
+    margin-top: auto;
     gap: 10px;
 }
 

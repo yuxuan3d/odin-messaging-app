@@ -38,3 +38,18 @@
     font-size: 0.9em;
     color: #c7c7c7;
 }
+
+.input-container {
+    display: flex;
+    width: 100%;
+    margin-top: auto;
+    gap: 10px;
+}
+
+.user-finder-input {
+    height: 30px;
+    background-color: #1e1e1e;
+    border: 1px solid #585858;
+    border-radius: 5px;
+    width: 100%;
+}

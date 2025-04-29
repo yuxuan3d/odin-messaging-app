@@ -9,6 +9,11 @@ function List({ onSelectChat, selectedPartnerId }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Add username state
+  const [usernameToAdd, setUsernameToAdd] = useState('');
+  const [addloading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+
   useEffect(() => {
 
     const fetchRecentMessages = async () => {
@@ -28,6 +33,41 @@ function List({ onSelectChat, selectedPartnerId }) {
 
     fetchRecentMessages();
   }, [currentUser]);
+
+  const handleNewChat = async (e) => {
+    e.preventDefault();
+    const trimmedUsername = usernameToAdd.trim();
+    if (!trimmedUsername) return;
+
+    if (trimmedUsername === currentUser.username) {
+      setAddError("You cannot add yourself.");
+      return;
+    }
+
+    setAddLoading(true);
+    setAddError('');
+    try {
+      const response = await api.get(`/users/search`, {
+        params: { username: trimmedUsername }
+      });
+
+      const foundUser = response.data;
+
+      onSelectChat({ id: foundUser.id, username: foundUser.username });
+      setUsernameToAdd('');
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to find user.';
+      console.error("Error adding user:", errorMsg);
+      // Handle specific "Not Found" error from backend
+      if (error.response?.status === 404) {
+        setAddError(`User "${trimmedUsername}" not found.`);
+      } else {
+        setAddError(errorMsg);
+      }
+    } finally {
+      setAddLoading(false);
+    }
+  }
 
   if (loading) return <div>Loading messages...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -57,6 +97,12 @@ function List({ onSelectChat, selectedPartnerId }) {
           </div>
         );
       })}
+      
+      <div className='input-container'>
+        <input type="text" className='user-finder-input' placeholder=" Add a user..." value={usernameToAdd} onChange={(e) => setUsernameToAdd(e.target.value)} />
+        <button onClick={handleNewChat}>Add User</button>
+      </div>
+      {addError && <p className="add-error" style={{ color: 'red', padding: '0 10px', fontSize: '0.9em', marginTop: '5px' }}>{addError}</p>}
     </div>
   )
 }

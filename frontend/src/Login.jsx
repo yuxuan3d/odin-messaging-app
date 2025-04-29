@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext'; 
+import api from './services/api';
 
 function LoginForm() {
     const [username, setUsername] = useState('');
@@ -25,19 +26,45 @@ function LoginForm() {
         }
     }
 
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+            await api.post('/register', { username, password });
+            setUsername('');
+            setPassword('');
+            setError('Registration successful! You can now log in.');
+        } catch (error) {
+            console.error("Register failed:", error);
+            setError(error.message || 'Register failed. Check credentials');
+        } finally {
+            setLoading(false);
+        }
+    }
+
 
     return (
-        <form onSubmit={handleLogin}>
-            <h2>Login</h2>
-            <label htmlFor="username">Username:</label>
-            <input type="text" name="username" id="username" value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} required/>
-            <br />
-            <label htmlFor="password">Password:</label>
-            <input type="password" name="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required/>
-            <br />
-            <button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-        </form>
+        <div className='login-container'>
+            <form className='login-form'>
+                <h2>Login</h2>
+                <div className='login-form-fields'>
+                    <label htmlFor="username">Username: </label>
+                    <input type="text" name="username" id="username" value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} required/>
+                </div>
+                
+                <div className='login-form-fields'> 
+                <label htmlFor="password">Password: </label>
+                <input type="password" name="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required/>
+                </div>
+                <div className='button-container'>
+                    <button type="submit" disabled={loading} onClick={handleLogin}>{loading ? 'Logging in...' : 'Login'}</button>
+                    <button type="submit" disabled={loading} onClick={handleRegister}>{loading ? 'Registering...' : 'Register'}</button>
+                </div>
+                
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </form>
+        </div>
     )
 }
 
